@@ -1,0 +1,11 @@
+samples:
+ control_R1: samples/control_R1.fq.gz
+ control_R2: samples/control_R2.fq.gz
+ treated_R1: samples/treated_R1.fq.gz
+ treated_R2: samples/treated_R2.fq.gz
+reference:
+ bwaRef: reference/chr19
+annotation:
+ gtf: annotation/mouse.chr.gtf
+group:
+ group: samples/group.txt
