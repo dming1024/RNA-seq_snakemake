@@ -1,0 +1,67 @@
+configfile: "config.yaml"
+
+rule all:
+ input:
+  sampleName= expand("count/{sample}.count",sample=config["samples"]),
+  group= config["group"]["group"]
+ output:
+  data="count/merge.count",
+  res="count/result.csv"
+ script:
+  "merge.R"
+#rule all:
+# input:
+#  "count/merge.count"
+#  expand("count/{sample}.count",sample=config["samples"])
+
+rule quality_check:
+ input:
+  lambda wildcards: config["samples"][wildcards.sample]
+ output:
+  "qc/"
+ shell:
+  "fastqc -o {output} {input}"
+
+rule bwa:
+ input:
+  lambda wildcards: config["samples"][wildcards.sample]
+ output:
+  "bwa/{sample}.sam"
+ params:
+  INDEX= config["reference"]["bwaRef"]
+ shell:
+  "bowtie2 -x {params.INDEX} -q {input} -S {output}"
+
+rule bam:
+ input:
+  "bwa/{sample}.sam"
+ output:
+  "bam/{sample}.bam"
+ shell:
+  "samtools view -Sb {input} > {output}"
+
+rule sort:
+ input:
+  "bam/{sample}.bam"
+ output:
+  "sort/{sample}_sort.bam"
+ shell:
+  "samtools sort {input} -o {output}"
+
+rule index:
+ input:
+  "sort/{sample}_sort.bam"
+ output:
+  "sort/{sample}.bam.bi"
+ shell:
+  "samtools index {input} {output}"
+
+rule count:
+ input:
+  sample="sort/{sample}_sort.bam",
+  annotation=config["annotation"]["gtf"]
+ output:
+  "count/{sample}.count"
+ shell:
+  "htseq-count -f bam -r name -s no {input.sample}  {input.annotation} > {output}"
+
