@@ -17,6 +17,7 @@ normal,normal,cancer,cancer
 which illustrate the types of samples
 
 2. the input reference should look like this:
+
 reference/
 ├── chr19.1.bt2
 ├── chr19.2.bt2
@@ -29,6 +30,7 @@ reference/
 ├── chr19.rev.2.bt2
 
 3. the input annotation should like this:
+
 annotation/
 ├── gencode.v30.annotation.gtf
 ├── gencode.v30.annotation.lncRNA.gtf
@@ -40,3 +42,4 @@ annotation/
 ├── Mus_musculus.GRCm38.83.chr.gtf
 └── Mus_musculus.GRCm38.83.gtf
 
+4. the pipline should look like the dag.svg file
