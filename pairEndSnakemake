@@ -7,15 +7,14 @@ configfile: "pairedEnd.yaml"
 
 rule all:
 	input:
-		#expand("results/{sample}.bam.bai",sample=config["samples"]),
 		expand("/data/assay01/{sample}.count",sample=config["samples"])
-rule bwa:
+rule Hisat2:
 	input:
 		fw=lambda wildcards: expand("samples/{sample}_R1.fq.gz", sample=wildcards.sample),
 		re=lambda wildcards: expand("samples/{sample}_R2.fq.gz", sample=wildcards.sample)
 
 	params:INDEX="reference/genome"
-
+	
 	output:
 		sam="/data/assay01/{sample}.sam",
 		log="/data/assay01/{sample}.log"
@@ -30,7 +29,7 @@ rule sam2bam:
 	shell:
 		"samtools view -Sb {input} > {output}"
 
-rule samSort:
+rule bamSort:
 	input:
 		"/data/assay01/{sample}.bam"
 	output:
