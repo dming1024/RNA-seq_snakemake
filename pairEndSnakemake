@@ -1,0 +1,56 @@
+#author:fqq
+#date:2019-08-25
+#Prohibit commercial
+#wechat:yixuetongji001
+
+configfile: "pairedEnd.yaml"
+
+rule all:
+	input:
+		#expand("results/{sample}.bam.bai",sample=config["samples"]),
+		expand("/data/assay01/{sample}.count",sample=config["samples"])
+rule bwa:
+	input:
+		fw=lambda wildcards: expand("samples/{sample}_R1.fq.gz", sample=wildcards.sample),
+		re=lambda wildcards: expand("samples/{sample}_R2.fq.gz", sample=wildcards.sample)
+
+	params:INDEX="reference/genome"
+
+	output:
+		sam="/data/assay01/{sample}.sam",
+		log="/data/assay01/{sample}.log"
+	shell:
+		"hisat2 -t -x {params.INDEX} -1 {input.fw} -2 {input.re} -S {output.sam} 2>{output.log}"
+
+rule sam2bam:
+	input:
+		"/data/assay01/{sample}.sam"
+	output:
+		"/data/assay01/{sample}.bam"
+	shell:
+		"samtools view -Sb {input} > {output}"
+
+rule samSort:
+	input:
+		"/data/assay01/{sample}.bam"
+	output:
+		"/data/assay01/{sample}_sort.bam"
+	shell:
+		"samtools sort {input} -o {output}"
+
+rule bamIndex:
+	input:
+		"/data/assay01/{sample}_sort.bam"
+	output:
+		"/data/assay01/{sample}.bam.bai"
+	shell:
+		"samtools index {input} {output}"
+rule bamCount:
+	input:
+		sample="/data/assay01/{sample}_sort.bam",
+		annotation=config["annotation"]["gtf"]
+	output:
+		"/data/assay01/{sample}.count"
+	shell:
+		"htseq-count -f bam -r name -s yes {input.sample} {input.annotation} > {output}"
+

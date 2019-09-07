@@ -43,3 +43,5 @@ annotation/
 └── Mus_musculus.GRCm38.83.gtf
 
 4. the pipline should look like the dag.svg file
+
+5. v3.11.0.tar.bz2 is just a tutorial file, and you can delete it if you don't need
